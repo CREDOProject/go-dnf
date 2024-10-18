@@ -12,8 +12,8 @@ import (
 
 var execCommander = shell.New
 
-// godnf represents the DNF client.
-type godnf struct {
+// Dnf represents the DNF client.
+type Dnf struct {
 	binaryPath string
 }
 
@@ -27,8 +27,8 @@ type Options struct {
 }
 
 // Returns a new godnf value, which represents an initialized DNF client.
-func New(binaryPath string) *godnf {
-	return &godnf{binaryPath}
+func New(binaryPath string) *Dnf {
+	return &Dnf{binaryPath}
 }
 
 var (
@@ -36,7 +36,7 @@ var (
 )
 
 // Install a dnf package from its packageName.
-func (a *godnf) Install(packageName string, opt *Options) error {
+func (a *Dnf) Install(packageName string, opt *Options) error {
 	_, err := a.runner(
 		&runnerParams{
 			argumentBuilder: func() ([]string, error) {
@@ -55,7 +55,7 @@ func (a *godnf) Install(packageName string, opt *Options) error {
 
 // Update a packages from is packageName. If packageName is empty, updates all
 // the packages in the system.
-func (a *godnf) Update(packageName string, opt *Options) error {
+func (a *Dnf) Update(packageName string, opt *Options) error {
 	_, err := a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			if strings.TrimSpace(packageName) == "" {
@@ -72,7 +72,7 @@ func (a *godnf) Update(packageName string, opt *Options) error {
 }
 
 // Obtains a list of dependencies from a packageName.
-func (a *godnf) Depends(packageName string, opt *Options) error {
+func (a *Dnf) Depends(packageName string, opt *Options) error {
 	_, err := a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			if strings.TrimSpace(packageName) == "" {
@@ -89,7 +89,7 @@ func (a *godnf) Depends(packageName string, opt *Options) error {
 }
 
 // Remove a package from its packageName.
-func (a *godnf) Remove(packageName string, opt *Options) error {
+func (a *Dnf) Remove(packageName string, opt *Options) error {
 	_, err := a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			if strings.TrimSpace(packageName) == "" {
@@ -106,7 +106,7 @@ func (a *godnf) Remove(packageName string, opt *Options) error {
 }
 
 // Search a package from its packageName.
-func (a *godnf) Search(packageName string, opt *Options) error {
+func (a *Dnf) Search(packageName string, opt *Options) error {
 	_, err := a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			if strings.TrimSpace(packageName) == "" {
@@ -123,7 +123,7 @@ func (a *godnf) Search(packageName string, opt *Options) error {
 }
 
 // List all installed packages.
-func (a *godnf) List(opt *Options) error {
+func (a *Dnf) List(opt *Options) error {
 	_, err := a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			return []string{"list", "installed"}, nil
@@ -143,7 +143,7 @@ type runnerParams struct {
 }
 
 // runner runs a guest command with opt *Options.
-func (a *godnf) runner(params *runnerParams) ([]Package, error) {
+func (a *Dnf) runner(params *runnerParams) ([]Package, error) {
 	arguments, err := params.argumentBuilder()
 	if err != nil {
 		return nil, fmt.Errorf("runner: %v", err)
