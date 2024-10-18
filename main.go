@@ -23,6 +23,7 @@ type Options struct {
 	DryRun       bool
 	Output       io.Writer
 	NotAssumeYes bool
+	DestDir      string
 }
 
 // Returns a new godnf value, which represents an initialized DNF client.
@@ -178,6 +179,9 @@ func processOptions(opt *Options) []string {
 	}
 	if !opt.NotAssumeYes {
 		args = append(args, "--assumeyes")
+	}
+	if opt.DestDir != "" {
+		args = append(args, "--destdir", opt.DestDir)
 	}
 	return args
 }
