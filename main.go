@@ -28,6 +28,13 @@ type Options struct {
 
 // Returns a new godnf value, which represents an initialized DNF client.
 func New(binaryPath string) *Dnf {
+	if binaryPath == "" {
+		if binaryPath, err := DetectdnfBinary(); err == nil {
+			return &Dnf{binaryPath}
+		} else {
+			return nil
+		}
+	}
 	return &Dnf{binaryPath}
 }
 
