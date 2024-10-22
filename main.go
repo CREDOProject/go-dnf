@@ -79,20 +79,36 @@ func (a *Dnf) Update(packageName string, opt *Options) error {
 }
 
 // Obtains a list of dependencies from a packageName.
-func (a *Dnf) Depends(packageName string, opt *Options) error {
-	_, err := a.runner(&runnerParams{
+func (a *Dnf) Depends(packageName string, opt *Options) ([]Package, error) {
+	return a.runner(&runnerParams{
 		argumentBuilder: func() ([]string, error) {
 			if strings.TrimSpace(packageName) == "" {
 				return nil, fmt.Errorf("Depends: %v", errPackageNameNotSpecified)
 			}
 			return []string{"repoquery", "--deplist", packageName}, nil
 		},
-		parser: func(string) ([]Package, error) {
-			return nil, nil
+		parser: func(output string) ([]Package, error) {
+			dependencies := []Package{}
+			lines := strings.Split(output, "\n")
+			for _, line := range lines {
+				trimmed := strings.TrimSpace(line)
+				if trimmed == "" {
+					// Stop when there's two versions of the same package.
+					return dependencies, nil
+				}
+				if strings.HasPrefix(trimmed, "provider:") {
+					parts := strings.Split(trimmed, ": ")
+					if len(parts) == 2 {
+						dependencies = append(dependencies, Package{
+							Name: parts[1],
+						})
+					}
+				}
+			}
+			return dependencies, nil
 		},
 		opt: opt,
 	})
-	return err
 }
 
 // Remove a package from its packageName.
