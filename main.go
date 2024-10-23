@@ -178,7 +178,6 @@ func (a *Dnf) runner(params *runnerParams) ([]Package, error) {
 	command.Stdout = &buffer
 	if params.opt.Output != nil {
 		command.Stdout = io.MultiWriter(command.Stdout, params.opt.Output)
-		command.Stderr = io.MultiWriter(command.Stderr, params.opt.Output)
 	}
 	err = command.Run()
 	if err != nil {
