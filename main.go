@@ -92,9 +92,13 @@ func (a *Dnf) Depends(packageName string, opt *Options) ([]Package, error) {
 			lines := strings.Split(output, "\n")
 			for _, line := range lines {
 				trimmed := strings.TrimSpace(line)
-				if trimmed == "" {
-					// Stop when there's two versions of the same package.
-					return dependencies, nil
+				if strings.HasPrefix(trimmed, "package:") {
+					parts := strings.Split(trimmed, ": ")
+					if len(parts) == 2 {
+						dependencies = append(dependencies, Package{
+							Name: parts[1],
+						})
+					}
 				}
 				if strings.HasPrefix(trimmed, "provider:") {
 					parts := strings.Split(trimmed, ": ")
@@ -103,6 +107,10 @@ func (a *Dnf) Depends(packageName string, opt *Options) ([]Package, error) {
 							Name: parts[1],
 						})
 					}
+				}
+				if trimmed == "" {
+					// Stop when there's two versions of the same package.
+					return dependencies, nil
 				}
 			}
 			return dependencies, nil
